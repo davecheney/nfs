@@ -2,14 +2,15 @@ package rpc
 
 import (
 	"bufio"
-	"bytes"
 	"net"
+	"io"
 
 	"github.com/davecheney/nfs/xdr"
 )
 
 type Client struct {
 	transport
+	read chan []byte
 }
 
 func DialTCP(network, addr string) (*Client, error) {
@@ -21,65 +22,30 @@ func DialTCP(network, addr string) (*Client, error) {
         if err != nil {
                 return nil, err
         }
-        return &Client{ 	
-		transport: &tcpTransport {
-			Reader: bufio.NewReader(conn),
-                        WriteCloser: conn,
-                },
-        }, nil
+	t := &tcpTransport {
+		Reader: bufio.NewReader(conn),
+               WriteCloser: conn,
+        }
+	return &Client { t, t.run() }, nil	
 }
 
-func (c *Client) Call(prog, vers, proc uint32) *Writer {
-	buf := new(bytes.Buffer)
-	w := &Writer{
-		c,
-		buf,
-		xdr.Writer {
-			buf,
-		},
+func (c *Client) Call(call, reply interface{}) error {
+	msg := &message {
+		Xid: 0xcafebabe,
+		Msgtype: 0,
+		Body: call,
 	}
-	w.WriteUint32(0xcafebabe) // XID
-	w.WriteUint32(0) // CALL
-	w.WriteUint32(2) // RPC version 2
-	w.WriteUint32(prog)
-	w.WriteUint32(vers)
-	w.WriteUint32(proc)
-	w.WriteUint64(0) // AUTH_NULL
-	w.WriteUint64(0) // AUTH_NULL
-	return w 
-}
-
-type Reader struct {
-	xdr.Reader
-}
-
-type Writer struct {
-	*Client
-	buf *bytes.Buffer
-	xdr.Writer
-}
-
-func (w *Writer) Send() (*Reader, error) {
-	_, err := w.Client.transport.Write(w.buf.Bytes())
+	buf, err := xdr.Marshal(msg)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	r := &Reader { xdr.Reader { w.Client } }
-	var xid uint32
-	if err := r.ReadUint32(&xid) ; err != nil {
-		return nil, err
+	if _, err := c.transport.Write(buf); err != nil {
+		return err
 	}
-	var reply uint32
-	if err := r.ReadUint32(&reply); err != nil {
-		return nil, err
+	buf, ok := <- c.read
+	if !ok {
+		return io.EOF
 	}
-	var reply_stat uint32
-	if err := r.ReadUint32(&reply_stat); err != nil {
-		return nil, err
-	}
-	switch reply_stat {
-	case 0:
-		
-	}
-	return nil, nil
+	return xdr.Unmarshal(reply, buf)
 }
+
