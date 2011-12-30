@@ -1,4 +1,4 @@
-package main
+package nfs
 
 import (
 	"github.com/davecheney/nfs/rpc"
@@ -9,6 +9,8 @@ import (
 type Portmapper struct {
 	client *rpc.Client
 }
+
+func (p *Portmapper) Getport(
 
 func (p *Portmapper) Close() error {
 	return p.client.Close()
