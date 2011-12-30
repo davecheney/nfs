@@ -3,14 +3,12 @@ package rpc
 import (
 	"bufio"
 	"net"
-	"io"
 
 	"github.com/davecheney/nfs/xdr"
 )
 
 type Client struct {
 	transport
-	read chan []byte
 }
 
 func DialTCP(network, addr string) (*Client, error) {
@@ -24,9 +22,9 @@ func DialTCP(network, addr string) (*Client, error) {
         }
 	t := &tcpTransport {
 		Reader: bufio.NewReader(conn),
-               WriteCloser: conn,
+                WriteCloser: conn,
         }
-	return &Client { t, t.run() }, nil	
+	return &Client { t }, nil	
 }
 
 func (c *Client) Call(call, reply interface{}) error {
@@ -39,12 +37,12 @@ func (c *Client) Call(call, reply interface{}) error {
 	if err != nil {
 		return err
 	}
-	if _, err := c.transport.Write(buf); err != nil {
+	if err := c.send(buf); err != nil {
 		return err
 	}
-	buf, ok := <- c.read
-	if !ok {
-		return io.EOF
+	buf, err = c.recv()  
+	if err != nil {
+		return err
 	}
 	return xdr.Unmarshal(reply, buf)
 }
