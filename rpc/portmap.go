@@ -14,7 +14,7 @@ const (
 	PMAP_VERS = 2
 
 	PMAPPROC_GETPORT = 3
-	PMAPPROC_DUMP = 4
+	PMAPPROC_DUMP    = 4
 
 	IPPROTO_TCP = 6
 	IPPROTO_UDP = 17
@@ -36,15 +36,15 @@ func (p *Portmapper) Getport(mapping Mapping) (int, error) {
 		Header
 		Mapping
 	}
-	msg := &getport {
-		Header {
-                        Rpcvers: 2,
-                        Prog: PMAP_PROG,
-                        Vers: PMAP_VERS,
-                        Proc: PMAPPROC_GETPORT,                        
-                        Cred: AUTH_NULL,
-                        Verf: AUTH_NULL,
-                },
+	msg := &getport{
+		Header{
+			Rpcvers: 2,
+			Prog:    PMAP_PROG,
+			Vers:    PMAP_VERS,
+			Proc:    PMAPPROC_GETPORT,
+			Cred:    AUTH_NULL,
+			Verf:    AUTH_NULL,
+		},
 		mapping,
 	}
 	buf, err := p.Call(msg)
@@ -59,18 +59,18 @@ func (p *Portmapper) Dump() ([]byte, error) {
 	type dump struct {
 		Header
 	}
-	msg := &dump {
-		Header {
+	msg := &dump{
+		Header{
 			Rpcvers: 2,
-			Prog: PMAP_PROG,
-			Vers: PMAP_VERS,
-			Proc: PMAPPROC_DUMP,
-			Cred: AUTH_NULL,
-			Verf: AUTH_NULL,
+			Prog:    PMAP_PROG,
+			Vers:    PMAP_VERS,
+			Proc:    PMAPPROC_DUMP,
+			Cred:    AUTH_NULL,
+			Verf:    AUTH_NULL,
 		},
 	}
 	return p.Call(msg)
-}	
+}
 
 func DialPortmapper(net, host string) (*Portmapper, error) {
 	client, err := DialTCP(net, fmt.Sprintf("%s:%d", host, PMAP_PORT))

@@ -7,16 +7,16 @@ import (
 )
 
 func TestMarshalPortmap(t *testing.T) {
-	msg := Call {
+	msg := Call{
 		msg{
-			xid: 1,
+			xid:   1,
 			mtype: CALL,
 		},
 		call{
 			rpcvers: 2,
-			prog: 100000,
-			vers: 2,
-			proc: 0,
+			prog:    100000,
+			vers:    2,
+			proc:    0,
 		},
 	}
 	_, err := xdr.Marshal(msg)

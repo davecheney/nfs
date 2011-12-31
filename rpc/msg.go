@@ -1,7 +1,7 @@
 package rpc
 
 type msg struct {
-	xid uint
+	xid   uint
 	mtype msg_type
 }
 
@@ -11,27 +11,24 @@ type Call struct {
 }
 
 type call struct {
-	rpcvers	uint
-	prog	uint
-	vers	uint
-	proc	uint
+	rpcvers uint
+	prog    uint
+	vers    uint
+	proc    uint
 	cred
 	verf
 }
 
 type cred struct {
-	
 }
 
 type verf struct {
-
 }
 
 type Reply struct {
 	msg
-	reply 
+	reply
 }
 
 type reply interface {
-
 }

@@ -1,10 +1,10 @@
 package main
 
 import (
-	"log"
 	"fmt"
 	"github.com/davecheney/nfs"
 	"github.com/davecheney/nfs/rpc"
+	"log"
 )
 
 func main() {
@@ -13,11 +13,11 @@ func main() {
 		log.Fatalf("unable to contact portmapper: %v", err)
 	}
 	// get MOUNT port
-	m := rpc.Mapping {
+	m := rpc.Mapping{
 		Prog: nfs.MOUNT_PROG,
 		Vers: nfs.MOUNT_VERS,
-	 	Prot: rpc.IPPROTO_TCP,
-		Port: 0,		 	
+		Prot: rpc.IPPROTO_TCP,
+		Port: 0,
 	}
 	port, err := pm.Getport(m)
 	if err != nil {
@@ -29,5 +29,5 @@ func main() {
 	if err != nil {
 		log.Fatal("unable to dial MOUNT service: %v", err)
 	}
-	mount.Close()	
+	mount.Close()
 }

@@ -1,9 +1,9 @@
 package rpc
 
 import (
+	"encoding/binary"
 	"io"
 	"sync"
-	"encoding/binary"
 )
 
 type tcpTransport struct {
@@ -19,7 +19,7 @@ func (t *tcpTransport) recv() ([]byte, error) {
 	if err := binary.Read(t, binary.BigEndian, &hdr); err != nil {
 		return nil, err
 	}
-	buf := make([]byte, hdr & 0x7fffffff)
+	buf := make([]byte, hdr&0x7fffffff)
 	if _, err := io.ReadFull(t, buf); err != nil {
 		return nil, err
 	}
@@ -32,6 +32,6 @@ func (t *tcpTransport) send(buf []byte) error {
 	var hdr uint32 = uint32(len(buf)) | 0x80000000
 	b := make([]byte, 4)
 	binary.BigEndian.PutUint32(b, hdr)
-	_, err := t.WriteCloser.Write(append(b, buf...))	
+	_, err := t.WriteCloser.Write(append(b, buf...))
 	return err
 }

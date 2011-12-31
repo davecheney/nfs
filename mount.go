@@ -15,7 +15,7 @@ const (
 )
 
 type Export struct {
-	Dir string
+	Dir    string
 	Groups []Group
 }
 
@@ -28,30 +28,30 @@ type Mount struct {
 }
 
 func (m *Mount) Exports() ([]Export, error) {
-        type export struct {
-                rpc.Header
-        }
-        msg := &export {
-                rpc.Header {
-                        Rpcvers: 2,
-                        Prog: MOUNT_PROG,
-                        Vers: MOUNT_VERS,
-                        Proc: MOUNTPROC3_EXPORT,
-                        Cred: rpc.AUTH_NULL,
-                        Verf: rpc.AUTH_NULL,
-                },
-        }
-        _, err := m.Call(msg)
+	type export struct {
+		rpc.Header
+	}
+	msg := &export{
+		rpc.Header{
+			Rpcvers: 2,
+			Prog:    MOUNT_PROG,
+			Vers:    MOUNT_VERS,
+			Proc:    MOUNTPROC3_EXPORT,
+			Cred:    rpc.AUTH_NULL,
+			Verf:    rpc.AUTH_NULL,
+		},
+	}
+	_, err := m.Call(msg)
 	if err != nil {
 		return nil, err
 	}
-        return nil, nil
+	return nil, nil
 }
 
 func DialMount(net, addr string) (*Mount, error) {
-        client, err := rpc.DialTCP(net, addr)
-        if err != nil {
-                return nil, err
-        }
-        return &Mount{client}, nil
+	client, err := rpc.DialTCP(net, addr)
+	if err != nil {
+		return nil, err
+	}
+	return &Mount{client}, nil
 }
