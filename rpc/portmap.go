@@ -2,7 +2,7 @@ package rpc
 
 import (
 	"fmt"
-	"encoding/binary"
+	"github.com/davecheney/nfs/xdr"
 )
 
 // PORTMAP
@@ -48,7 +48,11 @@ func (p *Portmapper) Getport(mapping Mapping) (int, error) {
 		mapping,
 	}
 	buf, err := p.Call(msg)
-	return int(binary.BigEndian.Uint32(buf)), err
+	if err != nil {
+		return 0, err
+	}
+	port, _ := xdr.Uint32(buf)
+	return int(port), nil
 }
 
 func (p *Portmapper) Dump() (error) {
