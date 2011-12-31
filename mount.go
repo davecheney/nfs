@@ -1,7 +1,7 @@
 package nfs
 
 // MOUNT
-// RFC 1813 Section 5.1
+// RFC 1813 Section 5.0
 
 import (
 	"github.com/davecheney/nfs/rpc"
