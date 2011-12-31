@@ -2,6 +2,7 @@ package rpc
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/binary"
 	"fmt"
 	"net"
@@ -35,14 +36,14 @@ func (c *Client) Call(call interface{}) ([]byte, error) {
 		Msgtype: 0,
 		Body:    call,
 	}
-	buf, err := xdr.Marshal(msg)
-	if err != nil {
+	w := new(bytes.Buffer)
+	if err := xdr.Write(w, msg); err != nil {
 		return nil, err
 	}
-	if err := c.send(buf); err != nil {
+	if err := c.send(w.Bytes()); err != nil {
 		return nil, err
 	}
-	buf, err = c.recv()
+	buf, err := c.recv()
 	if err != nil {
 		return nil, err
 	}

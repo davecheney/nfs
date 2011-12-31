@@ -1,7 +1,9 @@
 package rpc
 
 import (
+	"bytes"
 	"io"
+	"github.com/davecheney/nfs/xdr"
 )
 
 type transport interface {
@@ -40,4 +42,21 @@ var AUTH_NULL = Auth {
 	[]byte { },
 }
 
+type AUTH_UNIX struct {
+	Stamp uint32
+	Machinename string
+	Uid uint32
+	Gid uint32
+	Gids uint32
+}
+
+// Auth converts a into an Auth opaque struct
+func (a AUTH_UNIX) Auth() Auth {
+	w := new(bytes.Buffer)
+	xdr.Write(w, a)
+	return Auth{
+		1, 
+		w.Bytes(),
+	}
+}	
 

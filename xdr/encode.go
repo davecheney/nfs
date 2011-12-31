@@ -1,16 +1,15 @@
 package xdr
 
 import (
-	"bytes"
+	"io"
 	"encoding/binary"
-	"errors"
+	"fmt"
 	"log"
 	"reflect"
 )
 
-func Marshal(val interface{}) ([]byte, error) {
+func Write(w io.Writer, val interface{}) (error) {
 	log.Println("marshal:", val)
-	b := new(bytes.Buffer)
 	v := reflect.ValueOf(val)
 	switch v.Kind() {
 	case reflect.Ptr:
@@ -18,27 +17,25 @@ func Marshal(val interface{}) ([]byte, error) {
 	case reflect.Struct:
 		v = v
 	default:
-		return nil, errors.New("rpc.Marshal: invalid type " + v.Type().String())
+		return fmt.Errorf("rpc.Write: invalid type: %v ", v.Type().String())
 	}
 	for i := 0; i < v.NumField(); i++ {
 		field := v.Field(i)
 		log.Println("field:", field)
 		switch t := field.Type(); t.Kind() {
 		case reflect.Uint, reflect.Uint32:
-			binary.Write(b, binary.BigEndian, uint32(field.Uint()))
+			binary.Write(w, binary.BigEndian, uint32(field.Uint()))
 		case reflect.Struct, reflect.Interface:
-			buf, err := Marshal(field.Interface())
-			if err != nil {
-				return nil, err
+			if err := Write(w, field.Interface()) ; err != nil {
+				return err
 			}
-			b.Write(buf)
 		case reflect.Slice:
 			switch t.Elem().Kind() {
 			case reflect.Uint8:
 				buf := field.Bytes()
 				log.Println("slice:", buf)
-				binary.Write(b, binary.BigEndian, uint32(len(buf)))
-				b.Write(buf)
+				binary.Write(w, binary.BigEndian, uint32(len(buf)))
+				w.Write(buf)
 			default:
 				panic("slice of unknown type " + t.Elem().Kind().String())
 			}
@@ -46,5 +43,5 @@ func Marshal(val interface{}) ([]byte, error) {
 			panic("field of unknown type " + t.Elem().Kind().String())
 		}
 	}
-	return b.Bytes(), nil
+	return nil
 }
