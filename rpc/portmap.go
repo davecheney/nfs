@@ -55,7 +55,7 @@ func (p *Portmapper) Getport(mapping Mapping) (int, error) {
 	return int(port), nil
 }
 
-func (p *Portmapper) Dump() (error) {
+func (p *Portmapper) Dump() ([]byte, error) {
 	type dump struct {
 		Header
 	}
@@ -69,8 +69,7 @@ func (p *Portmapper) Dump() (error) {
 			Verf: AUTH_NULL,
 		},
 	}
-	_, err := p.Call(msg)
-	return err
+	return p.Call(msg)
 }	
 
 func DialPortmapper(net, host string) (*Portmapper, error) {

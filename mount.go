@@ -15,14 +15,19 @@ const (
 )
 
 type Export struct {
+	Dir string
+	Groups []Group
+}
 
+type Group struct {
+	Name string
 }
 
 type Mount struct {
 	*rpc.Client
 }
 
-func (m *Mount) Exports() ([]*Export, error) {
+func (m *Mount) Exports() ([]Export, error) {
         type export struct {
                 rpc.Header
         }
