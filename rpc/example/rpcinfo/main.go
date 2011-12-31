@@ -11,6 +11,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("unable to connect to portmapper: %v", err)
 	}
-	// pm.Dump()
+	pm.Dump()
 	pm.Close()
 }

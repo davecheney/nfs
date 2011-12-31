@@ -10,3 +10,8 @@ type transport interface {
         io.Closer
 }
 
+type mismatch_info struct {
+	low uint32
+	high uint32
+}
+

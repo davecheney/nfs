@@ -7,27 +7,21 @@ const (
 	REPLY msg_type = 1
 )
 
-type reply_stat int
-
 const (
-	MSG_ACCEPTED reply_stat = iota
+	MSG_ACCEPTED = iota
 	MSG_DENIED 
 )
 
-type accept_stat int
-
 const (
-	SUCCESS accept_stat = iota
+	SUCCESS = iota
 	PROG_UNAVAIL 
 	PROG_MISMATCH 
 	PROC_UNAVAIL 
 	GARBAGE_ARGS 
 )
 
-type reject_stat int
-
 const (
-	RPC_MISMATCH reject_stat = iota
+	RPC_MISMATCH = iota
 	AUTH_ERROR 
 )
 

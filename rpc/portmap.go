@@ -2,6 +2,7 @@ package rpc
 
 import (
 	"fmt"
+	"encoding/binary"
 )
 
 // PORTMAP
@@ -9,7 +10,7 @@ import (
 
 const (
 	PMAP_PORT = 111
-	PMAP_PROG = 10000
+	PMAP_PROG = 100000
 	PMAP_VERS = 2
 
 	PMAPPROC_GETPORT = 3
@@ -27,15 +28,14 @@ type Mapping struct {
 }
 
 type Portmapper struct {
-	client *Client
+	*Client
 }
 
-func (p *Portmapper) Getport(mapping Mapping) (uint16, error) {
+func (p *Portmapper) Getport(mapping Mapping) (int, error) {
 	type getport struct {
 		Header
 		Mapping
 	}
-	
 	msg := &getport {
 		Header {
                         Rpcvers: 2,
@@ -47,13 +47,27 @@ func (p *Portmapper) Getport(mapping Mapping) (uint16, error) {
                 },
 		mapping,
 	}
-	err := p.client.Call(msg, nil)
-	return 0, err
+	buf, err := p.Call(msg)
+	return int(binary.BigEndian.Uint32(buf)), err
 }
 
-func (p *Portmapper) Close() error {
-	return p.client.Close()
-}
+func (p *Portmapper) Dump() (error) {
+	type dump struct {
+		Header
+	}
+	msg := &dump {
+		Header {
+			Rpcvers: 2,
+			Prog: PMAP_PROG,
+			Vers: PMAP_VERS,
+			Proc: PMAPPROC_DUMP,
+			Cred: AUTH_NULL,
+			Verf: AUTH_NULL,
+		},
+	}
+	_, err := p.Call(msg)
+	return err
+}	
 
 func DialPortmapper(net, host string) (*Portmapper, error) {
 	client, err := DialTCP(net, fmt.Sprintf("%s:%d", host, PMAP_PORT))

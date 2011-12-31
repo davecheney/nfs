@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"fmt"
 	"github.com/davecheney/nfs"
 	"github.com/davecheney/nfs/rpc"
 )
@@ -12,7 +13,6 @@ func main() {
 		log.Fatalf("unable to contact portmapper: %v", err)
 	}
 	// get MOUNT port
-
 	m := rpc.Mapping {
 		Prog: nfs.MOUNT_PROG,
 		Vers: nfs.MOUNT_VERS,
@@ -23,6 +23,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("unable to get MOUNT port: %v", err)
 	}
-	log.Printf("MOUNT port: %d", port)
-	pm.Close()	
+	log.Println("MOUNT", port)
+	pm.Close()
+	mount, err := nfs.DialMount("tcp", fmt.Sprintf("stora.local:%d", port))
+	if err != nil {
+		log.Fatal("unable to dial MOUNT service: %v", err)
+	}
+	mount.Close()	
 }
