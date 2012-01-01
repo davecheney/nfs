@@ -75,12 +75,16 @@ func (p *Portmapper) Dump() ([]Mapping, error) {
 		return nil, err
 	}
 	var mm []Mapping
-	for r := bytes.NewBuffer(buf) ; ; {
-		var m Mapping	
-		if err := xdr.Read(r, &m) ; err != nil {	
+	for r := bytes.NewBuffer(buf) ; r.Len() > 0 ; {
+		type index struct {
+			Index uint32
+			M Mapping
+		}
+		var i index
+		if err := xdr.Read(r, &i) ; err != nil {	
 			return nil, err
 		}
-		mm = append(mm, m)
+		mm = append(mm, i.M)
 	}	
 	return mm, nil
 }

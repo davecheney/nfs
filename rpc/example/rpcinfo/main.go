@@ -17,7 +17,7 @@ func main() {
 	}
 	fmt.Println("program\tvers\tproto\tport")
 	for _, m := range mappings {
-		fmt.Printf("%d\t%d\t%d\t%d", m.Prog, m.Vers, m.Prot, m.Port)
+		fmt.Printf("%d\t%d\t%d\t%d\n", m.Prog, m.Vers, m.Prot, m.Port)
 	}
 	pm.Close()
 }
