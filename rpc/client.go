@@ -3,7 +3,6 @@ package rpc
 import (
 	"bufio"
 	"bytes"
-	"encoding/binary"
 	"fmt"
 	"net"
 
@@ -58,14 +57,11 @@ func (c *Client) Call(call interface{}) ([]byte, error) {
 	reply_stat, buf := xdr.Uint32(buf)
 	switch reply_stat {
 	case MSG_ACCEPTED:
-		_ = binary.BigEndian.Uint32(buf[0:4])
-		buf = buf[4:]
-		opaque_len := binary.BigEndian.Uint32(buf[0:4])
-		buf = buf[4:]
+		_, buf = xdr.Uint32(buf)
+		opaque_len, buf := xdr.Uint32(buf)
 		_ = buf[0:int(opaque_len)]
 		buf = buf[opaque_len:]
-		accept_stat := binary.BigEndian.Uint32(buf[0:4])
-		buf = buf[4:]
+		accept_stat, buf := xdr.Uint32(buf)
 		switch accept_stat {
 		case SUCCESS:
 			return buf, nil
@@ -78,8 +74,7 @@ func (c *Client) Call(call interface{}) ([]byte, error) {
 			return nil, fmt.Errorf("rpc: %d", accept_stat)
 		}
 	case MSG_DENIED:
-		rejected_stat := binary.BigEndian.Uint32(buf[0:4])
-		buf = buf[4:]
+		rejected_stat, _ := xdr.Uint32(buf)
 		switch rejected_stat {
 		case RPC_MISMATCH:
 

@@ -10,7 +10,7 @@ func TestRead(t *testing.T) {
 		A, B, C, D uint32
 	}
 	x := new(X)
-	b := []byte{ 
+	b := []byte{
 		0, 0, 0, 1,
 		0, 0, 0, 2,
 		0, 0, 0, 3,
@@ -19,4 +19,4 @@ func TestRead(t *testing.T) {
 	}
 	buf := bytes.NewBuffer(b)
 	Read(buf, x)
-}	
+}

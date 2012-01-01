@@ -1,14 +1,14 @@
 package xdr
 
 import (
-	"io"
 	"encoding/binary"
 	"fmt"
+	"io"
 	"log"
 	"reflect"
 )
 
-func Write(w io.Writer, val interface{}) (error) {
+func Write(w io.Writer, val interface{}) error {
 	log.Println("marshal:", val)
 	v := reflect.ValueOf(val)
 	switch v.Kind() {
@@ -26,9 +26,16 @@ func Write(w io.Writer, val interface{}) (error) {
 		case reflect.Uint, reflect.Uint32:
 			binary.Write(w, binary.BigEndian, uint32(field.Uint()))
 		case reflect.Struct, reflect.Interface:
-			if err := Write(w, field.Interface()) ; err != nil {
+			if err := Write(w, field.Interface()); err != nil {
 				return err
 			}
+		case reflect.String:
+			l := field.Len()
+			binary.Write(w, binary.BigEndian, uint32(l))
+			b := []byte(field.String())
+			// pad to 32 bits
+			b = append(b, make([]byte, l % 4)...)
+			w.Write(b)
 		case reflect.Slice:
 			switch t.Elem().Kind() {
 			case reflect.Uint8:
@@ -40,7 +47,7 @@ func Write(w io.Writer, val interface{}) (error) {
 				panic("slice of unknown type " + t.Elem().Kind().String())
 			}
 		default:
-			panic("field of unknown type " + t.Elem().Kind().String())
+			panic("field of unknown type " + t.Kind().String())
 		}
 	}
 	return nil

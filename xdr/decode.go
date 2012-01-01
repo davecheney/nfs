@@ -1,14 +1,28 @@
 package xdr
 
 import (
+	"encoding/binary"
 	"fmt"
 	"io"
 	"reflect"
-	"encoding/binary"
 )
 
 func Uint32(b []byte) (uint32, []byte) {
 	return binary.BigEndian.Uint32(b[0:4]), b[4:]
+}
+
+func Opaque(b []byte) ([]byte, []byte) {
+	l, b := Uint32(b)
+	return b[:l], b[l:]
+}
+
+func Uint32List(b []byte) ([]uint32,[]byte) {
+	l, b := Uint32(b)
+	v := make([]uint32, l)
+	for i := 0 ; i < int(l) ; i++ {
+		v[i], b = Uint32(b)
+	}
+	return v, b	
 }
 
 func Read(r io.Reader, val interface{}) error {
@@ -28,7 +42,7 @@ func read(r io.Reader, v reflect.Value) error {
 	fmt.Println("value:", v)
 	switch t := v.Type(); t.Kind() {
 	case reflect.Struct:
-		for i := 0; i < v.NumField() ; i++ {
+		for i := 0; i < v.NumField(); i++ {
 			if err := read(r, v.Field(i)); err != nil {
 				return err
 			}

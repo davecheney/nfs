@@ -7,5 +7,3 @@ import (
 type Client struct {
 	*rpc.Client
 }
-
-

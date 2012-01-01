@@ -11,7 +11,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("unable to connect to portmapper: %v", err)
 	}
-	mappings, err := pm.Dump(); 
+	mappings, err := pm.Dump()
 	if err != nil {
 		log.Fatalf("failed to call PORTMAP.DUMP: %v", err)
 	}

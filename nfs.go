@@ -8,4 +8,10 @@ const (
 	NFS3_VERS = 3
 )
 
-	
+// Error represents an unexpected I/O behavior.
+type Error struct {
+        ErrorString string
+}
+
+func (err *Error) Error() string { return err.ErrorString }
+
