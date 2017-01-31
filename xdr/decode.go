@@ -16,13 +16,13 @@ func Opaque(b []byte) ([]byte, []byte) {
 	return b[:l], b[l:]
 }
 
-func Uint32List(b []byte) ([]uint32,[]byte) {
+func Uint32List(b []byte) ([]uint32, []byte) {
 	l, b := Uint32(b)
 	v := make([]uint32, l)
-	for i := 0 ; i < int(l) ; i++ {
+	for i := 0; i < int(l); i++ {
 		v[i], b = Uint32(b)
 	}
-	return v, b	
+	return v, b
 }
 
 func Read(r io.Reader, val interface{}) error {
