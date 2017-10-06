@@ -1,7 +1,4 @@
-NFS Client for Golang
-=====================
+NFS Client for Go
+=================
 
-Installation
-------------
-
-This library uses gb to build. Simply run gb in the root of the checkout then have a look in the {{_bin}} directory for examples.
+This library is not under active development. Please do not send patches or raise issues.
